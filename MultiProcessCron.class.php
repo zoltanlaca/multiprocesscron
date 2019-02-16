@@ -2,6 +2,7 @@
 
 /**
  * Class MultiProcessCron
+ * @version v1.1 [2019-02-17]
  * @author  Zoltan Laca
  * @copyright 2019 Zoltan Laca
  * @license MIT https://github.com/zoltanlaca/multiprocesscron/blob/master/LICENSE
