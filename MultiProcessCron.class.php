@@ -121,6 +121,7 @@ class MultiProcessCron
         $cronJob->month = $month;
         $cronJob->weekday = $weekday;
         $cronJob->killAfterSeconds = $killAfterSecond;
+        $cronJob->lastRun = null;
         $this->jobs[] = $cronJob;
     }
 
@@ -141,13 +142,15 @@ class MultiProcessCron
              */
             foreach ($this->jobs as $jobKey => $cronJob) {
 
-                if (!array_key_exists($jobKey, $this->runningJobs)
+                if ( !array_key_exists($jobKey, $this->runningJobs)
                     AND $this->haveRunNow($cronJob->second, $cronJob->minute, $cronJob->hour, $cronJob->day, $cronJob->month, $cronJob->weekday)
+                    AND $this->jobs[$jobKey]->lastRun != time()
                 ) {
                     $newRunningJob = New \stdClass();
                     $newRunningJob->pid = $this->processStart($cronJob->cmd);
                     $newRunningJob->startTime = microtime(true);
                     $this->runningJobs[$jobKey] = $newRunningJob;
+                    $this->jobs[$jobKey]->lastRun = time();
                 }
             }
             time_nanosleep(0, 500000000);
