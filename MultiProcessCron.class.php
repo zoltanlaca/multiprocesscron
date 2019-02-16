@@ -146,7 +146,6 @@ class MultiProcessCron
                     $this->runningJobs[$jobKey] = $newRunningJob;
                 }
             }
-
             time_nanosleep(0, 500000000);
         }
 
@@ -235,7 +234,77 @@ class MultiProcessCron
      */
     private function haveRunNow(string $second, string $minute, string $hour, string $day, string $month, string $weekday): bool
     {
-        //TODO: crontab run params
+        $toCheck = [
+            'second' => 's',
+            'minute' => 'i',
+            'hour' => 'G',
+            'day' => 'j',
+            'month' => 'n',
+            'weekday' => 'w',
+        ];
+
+        $ranges = [
+            'second' => '0-59',
+            'minute' => '0-59',
+            'hour' => '0-23',
+            'day' => '1-31',
+            'month' => '1-12',
+            'weekday' => '0-6',
+        ];
+
+        foreach ($toCheck as $part => $c) {
+            $val = $$part;
+            $values = [];
+
+            /*
+             * For patters like 0-23/2
+             */
+            if (strpos($val, '/') !== false) {
+                /*
+                 * Get the range and step
+                 */
+                list($range, $steps) = explode('/', $val);
+
+                /*
+                 * Now get the start and stop
+                 */
+                if ($range == '*') {
+                    $range = $ranges[$part];
+                }
+                list($start, $stop) = explode('-', $range);
+
+                for ($i = $start; $i <= $stop; $i = $i + $steps) {
+                    $values[] = $i;
+                }
+            }
+
+            /*
+             * For patters like :
+             * 2
+             * 2,5,8
+             * 2-23
+             */
+            else {
+                $k = explode(',', $val);
+
+                foreach ($k as $v) {
+                    if (strpos($v, '-') !== false) {
+                        list($start, $stop) = explode('-', $v);
+
+                        for ($i = $start; $i <= $stop; $i++) {
+                            $values[] = $i;
+                        }
+                    } else {
+                        $values[] = $v;
+                    }
+                }
+            }
+
+            if (!in_array(date($c, time()), $values) and (strval($val) != '*')) {
+                return false;
+            }
+        }
+
         return true;
     }
 
