@@ -5,7 +5,7 @@
 define('MY_DOC_ROOT', realpath(__DIR__ . '/..'));
 
 /*
- * include MultiprocessCron class
+ * include MultiProcessCron class
  */
 include_once(MY_DOC_ROOT . '/MultiProcessCron.class.php');
 

@@ -1,6 +1,6 @@
 <?php
 /*
- * Only test file, random sleeep for a small execution time
+ * Only test file, random sleeep for a short execution time
  */
 $sleepTime = rand(10, 20);
 
